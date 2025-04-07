@@ -1,0 +1,55 @@
+{# templates/login.html #}
+{% extends 'base.html' %} {# Assurez-vous que le chemin vers base.html est correct #}
+
+{% block title %}Connexion - Mon Application RH{% endblock %}
+
+{% block content %}
+<section class="login-container">
+    <h2>Connexion</h2>
+
+    {# Affichage des messages Flash (si vous utilisez Flask/Django) #}
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <ul class="flashes">
+        {% for category, message in messages %}
+          <li class="{{ category }}">{{ message }}</li>
+        {% endfor %}
+        </ul>
+      {% endif %}
+    {% endwith %}
+
+    {# Adaptez l'action et les noms des champs selon votre backend (Flask, Django...) #}
+    <form method="POST" action="{{ url_for('login') }}"> {# Exemple pour Flask #}
+        {# Inclusion d'un token CSRF (important pour la sécurité !) #}
+        {# Pour Flask-WTF: {{ form.hidden_tag() }} #}
+        {# Pour Django: {% csrf_token %} #}
+        <input type="hidden" name="csrf_token" value="VOTRE_TOKEN_CSRF_ICI"> {# Version HTML simple #}
+
+        <div class="form-group">
+            <label for="username">Nom d'utilisateur ou Email :</label>
+            <input type="text" id="username" name="username" class="form-control" required>
+            {# Si vous utilisez WTForms (Flask): {{ form.username(class="form-control", id="username", required=True) }} #}
+        </div>
+
+        <div class="form-group">
+            <label for="password">Mot de passe :</label>
+            <input type="password" id="password" name="password" class="form-control" required>
+             {# Si vous utilisez WTForms (Flask): {{ form.password(class="form-control", id="password", required=True) }} #}
+        </div>
+
+         {# Optionnel : Se souvenir de moi #}
+         <div class="form-group form-check">
+             <input type="checkbox" id="remember_me" name="remember_me" class="form-check-input">
+             <label for="remember_me" class="form-check-label">Se souvenir de moi</label>
+              {# Si vous utilisez WTForms (Flask): {{ form.remember_me() }} {{ form.remember_me.label }} #}
+         </div>
+
+        <button type="submit" class="btn btn-primary">Se connecter</button>
+    </form>
+
+    <p class="extra-links">
+        <a href="#">Mot de passe oublié ?</a>
+        {# <a href="{{ url_for('register') }}">Créer un compte</a> #}
+    </p>
+</section>
+{% endblock %}

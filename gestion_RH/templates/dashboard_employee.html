@@ -1,0 +1,63 @@
+{# templates/dashboard_employee.html #}
+{% extends 'base.html' %}
+
+{% block title %}Tableau de Bord - {{ user.username }}{% endblock %} {# Adaptez 'user.username' #}
+
+{% block content %}
+<section class="dashboard-container">
+    {# Adaptez 'user.prenom' ou 'user.username' #}
+    <h2>Bienvenue, {{ user.prenom | default(user.username, true) }} !</h2>
+    <p>Ceci est votre espace personnel pour gérer vos demandes.</p>
+
+    <div class="dashboard-actions">
+        <a href="{{ url_for('creer_demande') }}" class="btn btn-success">Faire une Nouvelle Demande</a>
+        {# Ajoutez d'autres actions rapides si nécessaire #}
+    </div>
+
+    <h3>Mes Demandes Récentes</h3>
+
+    {# Boucle sur les demandes de l'utilisateur (variable 'demandes' passée par le backend) #}
+    {% if demandes %}
+    <table class="table demandes-table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Type</th>
+                <th>Date Soumission</th>
+                <th>Période Demandée</th>
+                <th>Statut</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for demande in demandes %}
+            <tr>
+                <td>#{{ demande.id }}</td>
+                <td>{{ demande.type_demande }}</td>
+                {# Utilisez un filtre pour formater les dates si disponible #}
+                <td>{{ demande.date_soumission | dateformat('%d/%m/%Y') }}</td>
+                <td>Du {{ demande.date_debut | dateformat('%d/%m/%Y') }} au {{ demande.date_fin | dateformat('%d/%m/%Y') }}</td>
+                <td>
+                    {# Classe CSS dynamique pour le statut #}
+                    <span class="status status-{{ demande.statut | lower }}">{{ demande.statut }}</span>
+                </td>
+                <td>
+                    <a href="{{ url_for('detail_demande', demande_id=demande.id) }}" class="btn btn-info btn-sm">Voir Détails</a>
+                    {# Optionnel: Bouton Annuler si le statut le permet #}
+                    {% if demande.statut == 'Soumis' %} {# Adaptez les statuts possibles #}
+                    {# <form method="POST" action="{{ url_for('annuler_demande', demande_id=demande.id) }}" style="display:inline;"> #}
+                        {# CSRF token #}
+                        {# <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Annuler cette demande ?')">Annuler</button> #}
+                    {# </form> #}
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p>Vous n'avez soumis aucune demande pour le moment.</p>
+    {% endif %}
+
+</section>
+{% endblock %}

@@ -1,0 +1,99 @@
+{# templates/detail_demande.html #}
+{% extends 'base.html' %}
+
+{% block title %}Détails Demande #{{ demande.id }}{% endblock %}
+
+{% block content %}
+<section class="detail-container">
+    <h2>Détails de la Demande #{{ demande.id }}</h2>
+
+    {# Affichage des messages Flash #}
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <ul class="flashes">
+        {% for category, message in messages %}
+          <li class="{{ category }}">{{ message }}</li>
+        {% endfor %}
+        </ul>
+      {% endif %}
+    {% endwith %}
+
+
+    <div class="demande-details">
+        <div class="detail-item">
+            <strong>ID Demande :</strong> {{ demande.id }}
+        </div>
+        <div class="detail-item">
+            {# Adaptez 'demande.demandeur.nom_complet' ou similaire #}
+            <strong>Demandeur :</strong> {{ demande.demandeur.prenom }} {{ demande.demandeur.nom }} ({{ demande.demandeur.username }})
+        </div>
+        <div class="detail-item">
+            <strong>Type :</strong> {{ demande.type_demande }}
+        </div>
+         <div class="detail-item">
+            <strong>Date de Soumission :</strong> {{ demande.date_soumission | dateformat('%d/%m/%Y %H:%M') }}
+        </div>
+         <div class="detail-item">
+            <strong>Date de Début :</strong> {{ demande.date_debut | dateformat('%d/%m/%Y') }}
+        </div>
+         <div class="detail-item">
+            <strong>Date de Fin :</strong> {{ demande.date_fin | dateformat('%d/%m/%Y') }}
+        </div>
+        <div class="detail-item">
+            <strong>Statut :</strong> <span class="status status-{{ demande.statut | lower }}">{{ demande.statut }}</span>
+        </div>
+        <div class="detail-item">
+            <strong>Motif / Détails :</strong>
+             {# Utiliser nl2br pour respecter les sauts de ligne entrés dans le textarea #}
+            <div class="motif-box">{{ demande.motif | nl2br }}</div>
+        </div>
+
+        {# Section optionnelle pour les informations d'approbation (si applicable) #}
+        {% if demande.approbateur %}
+        <hr>
+        <h4>Traitement</h4>
+         <div class="detail-item">
+             {# Adaptez 'demande.approbateur.nom_complet' #}
+            <strong>Traité par :</strong> {{ demande.approbateur.prenom }} {{ demande.approbateur.nom }}
+        </div>
+         <div class="detail-item">
+            <strong>Date de Traitement :</strong> {{ demande.date_traitement | dateformat('%d/%m/%Y %H:%M') }}
+        </div>
+         {% if demande.commentaire_approbateur %}
+         <div class="detail-item">
+            <strong>Commentaire Approbateur :</strong>
+            <div class="comment-box">{{ demande.commentaire_approbateur | nl2br }}</div>
+         </div>
+         {% endif %}
+        {% endif %}
+    </div>
+
+    <div class="detail-actions">
+         {# Bouton pour revenir en arrière (tableau de bord ou liste) #}
+        <a href="{{ url_for('dashboard') }}" class="btn btn-secondary">Retour</a>
+
+        {# Actions conditionnelles (Modifier/Annuler) pour l'employé #}
+        {% if user.id == demande.demandeur_id and demande.statut == 'Soumis' %} {# Adaptez user.id et statut #}
+             {# <a href="{{ url_for('modifier_demande', demande_id=demande.id) }}" class="btn btn-warning">Modifier</a> #}
+             {# <form method="POST" action="{{ url_for('annuler_demande', demande_id=demande.id) }}" style="display:inline;"> #}
+                {# CSRF token #}
+                {# <button type="submit" class="btn btn-danger" onclick="return confirm('Êtes-vous sûr de vouloir annuler cette demande ?')">Annuler la demande</button> #}
+             {# </form> #}
+        {% endif %}
+
+         {# Actions conditionnelles pour un manager/admin (Approuver/Rejeter) #}
+         {# {% if user.role == 'manager' and demande.statut == 'Soumis' %}
+             <form method="POST" action="{{ url_for('approuver_demande', demande_id=demande.id) }}" style="display:inline;">
+                 {# CSRF token #}
+                 {# <button type="submit" class="btn btn-success">Approuver</button> #}
+             {# </form> #}
+             {# <form method="POST" action="{{ url_for('rejeter_demande', demande_id=demande.id) }}" style="display:inline;"> #}
+                 {# CSRF token #}
+                 {# <button type="submit" class="btn btn-danger">Rejeter</button> #}
+             {# </form> #}
+         {# {% endif %} #}
+
+    </div>
+
+</section>
+{% endblock %}

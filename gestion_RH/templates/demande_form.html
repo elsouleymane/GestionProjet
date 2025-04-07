@@ -1,0 +1,111 @@
+{# templates/demande_form.html #}
+{% extends 'base.html' %}
+
+{# Le titre change si on modifie ou crée une demande (test sur la présence d'un ID par ex) #}
+{% block title %}{% if form.id.data %}Modifier{% else %}Nouvelle{% endif %} Demande{% endblock %}
+
+{% block content %}
+<section class="form-container">
+    <h2>{% if form.id.data %}Modifier la Demande #{{ form.id.data }}{% else %}Créer une Nouvelle Demande{% endif %}</h2>
+
+    {# Affichage des messages Flash #}
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <ul class="flashes">
+        {% for category, message in messages %}
+          <li class="{{ category }}">{{ message }}</li>
+        {% endfor %}
+        </ul>
+      {% endif %}
+    {% endwith %}
+
+    {# L'action du formulaire est souvent définie dans la vue qui rend le template #}
+    <form method="POST" action="">
+        {# CSRF Token #}
+        {# Pour Flask-WTF: {{ form.hidden_tag() }} - peut inclure l'ID pour l'édition #}
+        {# Pour Django: {% csrf_token %} #}
+        <input type="hidden" name="csrf_token" value="VOTRE_TOKEN_CSRF_ICI">
+        {# Si édition, inclure un champ caché pour l'ID si pas géré par WTForms/DjangoForms #}
+        {% if form and form.id and form.id.data %}
+         <input type="hidden" name="demande_id" value="{{ form.id.data }}">
+        {% endif %}
+
+
+        {# Exemple avec WTForms (Flask). Adaptez si vous utilisez autre chose #}
+        {# Ou utilisez des <input>, <select>, <textarea> HTML standard #}
+
+        <div class="form-group">
+            {{ form.type_demande.label }} <span class="required">*</span>
+            {{ form.type_demande(class="form-control" ~ (" is-invalid" if form.type_demande.errors else "")) }}
+            {% if form.type_demande.errors %}
+                <div class="invalid-feedback">
+                    {% for error in form.type_demande.errors %}<span>{{ error }}</span>{% endfor %}
+                </div>
+            {% endif %}
+            {# Version HTML simple:
+            <label for="type_demande">Type de Demande : <span class="required">*</span></label>
+            <select id="type_demande" name="type_demande" class="form-control" required>
+                <option value="">-- Sélectionnez --</option>
+                <option value="Congés Payés">Congés Payés</option>
+                <option value="RTT">RTT</option>
+                <option value="Maladie">Arrêt Maladie</option>
+                <option value="Formation">Formation</option>
+                <option value="Télétravail">Télétravail</option>
+                <option value="Autre">Autre</option>
+            </select>
+             #}
+        </div>
+
+        <div class="form-group">
+            {{ form.date_debut.label }} <span class="required">*</span>
+             {# Utiliser type="date" pour le sélecteur de date du navigateur #}
+            {{ form.date_debut(class="form-control" ~ (" is-invalid" if form.date_debut.errors else ""), type="date") }}
+             {% if form.date_debut.errors %}
+                <div class="invalid-feedback">
+                    {% for error in form.date_debut.errors %}<span>{{ error }}</span>{% endfor %}
+                </div>
+            {% endif %}
+            {# Version HTML simple:
+             <label for="date_debut">Date de début : <span class="required">*</span></label>
+             <input type="date" id="date_debut" name="date_debut" class="form-control" required>
+            #}
+        </div>
+
+        <div class="form-group">
+             {{ form.date_fin.label }} <span class="required">*</span>
+            {{ form.date_fin(class="form-control" ~ (" is-invalid" if form.date_fin.errors else ""), type="date") }}
+             {% if form.date_fin.errors %}
+                <div class="invalid-feedback">
+                    {% for error in form.date_fin.errors %}<span>{{ error }}</span>{% endfor %}
+                </div>
+            {% endif %}
+            {# Version HTML simple:
+             <label for="date_fin">Date de fin : <span class="required">*</span></label>
+             <input type="date" id="date_fin" name="date_fin" class="form-control" required>
+             #}
+        </div>
+
+        <div class="form-group">
+             {{ form.motif.label }} <span class="required">*</span>
+            {{ form.motif(class="form-control" ~ (" is-invalid" if form.motif.errors else ""), rows="4") }}
+             {% if form.motif.errors %}
+                <div class="invalid-feedback">
+                    {% for error in form.motif.errors %}<span>{{ error }}</span>{% endfor %}
+                </div>
+            {% endif %}
+            {# Version HTML simple:
+            <label for="motif">Motif / Détails : <span class="required">*</span></label>
+            <textarea id="motif" name="motif" class="form-control" rows="4" required></textarea>
+            #}
+        </div>
+
+         <p><small><span class="required">*</span> Champs obligatoires</small></p>
+
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">{% if form.id.data %}Enregistrer les Modifications{% else %}Soumettre la Demande{% endif %}</button>
+            {# Lien retour vers le tableau de bord ou la page précédente #}
+            <a href="{{ url_for('dashboard') }}" class="btn btn-secondary">Annuler</a>
+        </div>
+    </form>
+</section>
+{% endblock %}
