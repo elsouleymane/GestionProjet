@@ -1,6 +1,6 @@
 {# templates/demande_form.html #}
 {% extends 'base.html' %}
-
+{% load static %}
 {# Le titre change si on modifie ou crée une demande (test sur la présence d'un ID par ex) #}
 {% block title %}{% if form.id.data %}Modifier{% else %}Nouvelle{% endif %} Demande{% endblock %}
 
