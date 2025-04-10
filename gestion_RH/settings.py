@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-4xk1#6m!l21**%g=0id((esx%$fw)_3qz1!3f6x7*g0dck*8d!
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['https://*.github.dev', 'https://*.gitpod.io', 'localhost']
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'gestionprojet-aadp.onrender.com', '.onrender.com']
 
 
 # Application definition
