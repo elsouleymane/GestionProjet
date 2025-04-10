@@ -9,6 +9,7 @@ urlpatterns = [
     path('demande/<int:pk>/', views.detail_demande, name='detail_demande'),
     path('demande/<int:pk>/approuver/', views.approuver_demande, name='approuver_demande'),
     path('demande/<int:pk>/rejeter/', views.rejeter_demande, name='rejeter_demande'),
+    path('demande/<int:pk>/imprimer/', views.imprimer_demande, name='imprimer_demande'),  # Ajout de l'URL pour imprimer une demande
     # Nouvelles URLs pour la gestion des employés
     path('employes/', views.liste_employes, name='liste_employes'),
     path('employes/creer/', views.creer_employe, name='creer_employe'),
