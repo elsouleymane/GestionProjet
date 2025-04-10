@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Bienvenue{% endblock %}
+
+{% block content %}
+<div class="welcome-container">
+    <h1>Bienvenue sur le système de gestion des ressources</h1>
+    <p>Ce système permet de gérer les demandes des employés de manière efficace.</p>
+    <div class="button-container">
+        <a href="{% url 'login' %}" class="btn btn-primary">Se connecter</a>
+    </div>
+</div>
+{% endblock %}

@@ -1,55 +1,54 @@
-{# templates/login.html #}
-{% extends 'base.html' %} {# Assurez-vous que le chemin vers base.html est correct #}
+{% extends 'base.html' %}
+{% load static %}
 
-{% block title %}Connexion - Mon Application RH{% endblock %}
+{% block title %}Connexion{% endblock %}
 
 {% block content %}
 <section class="login-container">
     <h2>Connexion</h2>
-
-    {# Affichage des messages Flash (si vous utilisez Flask/Django) #}
-    {% with messages = get_flashed_messages(with_categories=true) %}
-      {% if messages %}
-        <ul class="flashes">
-        {% for category, message in messages %}
-          <li class="{{ category }}">{{ message }}</li>
-        {% endfor %}
-        </ul>
-      {% endif %}
-    {% endwith %}
-
-    {# Adaptez l'action et les noms des champs selon votre backend (Flask, Django...) #}
-    <form method="POST" action="{{ url_for('login') }}"> {# Exemple pour Flask #}
-        {# Inclusion d'un token CSRF (important pour la sécurité !) #}
-        {# Pour Flask-WTF: {{ form.hidden_tag() }} #}
-        {# Pour Django: {% csrf_token %} #}
-        <input type="hidden" name="csrf_token" value="VOTRE_TOKEN_CSRF_ICI"> {# Version HTML simple #}
-
-        <div class="form-group">
-            <label for="username">Nom d'utilisateur ou Email :</label>
-            <input type="text" id="username" name="username" class="form-control" required>
-            {# Si vous utilisez WTForms (Flask): {{ form.username(class="form-control", id="username", required=True) }} #}
-        </div>
-
-        <div class="form-group">
-            <label for="password">Mot de passe :</label>
-            <input type="password" id="password" name="password" class="form-control" required>
-             {# Si vous utilisez WTForms (Flask): {{ form.password(class="form-control", id="password", required=True) }} #}
-        </div>
-
-         {# Optionnel : Se souvenir de moi #}
-         <div class="form-group form-check">
-             <input type="checkbox" id="remember_me" name="remember_me" class="form-check-input">
-             <label for="remember_me" class="form-check-label">Se souvenir de moi</label>
-              {# Si vous utilisez WTForms (Flask): {{ form.remember_me() }} {{ form.remember_me.label }} #}
-         </div>
-
+    
+    {% if form.errors %}
+    <div class="alert alert-danger">
+        <p>Votre nom d'utilisateur ou mot de passe est incorrect. Veuillez réessayer.</p>
+    </div>
+    {% endif %}
+    
+    <form method="post" action="{% url 'login' %}">
+        {% csrf_token %}
+        {{ form.as_p }}
         <button type="submit" class="btn btn-primary">Se connecter</button>
+        <input type="hidden" name="next" value="{{ next }}">
     </form>
-
-    <p class="extra-links">
-        <a href="#">Mot de passe oublié ?</a>
-        {# <a href="{{ url_for('register') }}">Créer un compte</a> #}
-    </p>
 </section>
+
+<style>
+    .login-container {
+        max-width: 400px;
+        margin: 50px auto;
+        padding: 20px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        background-color: white;
+        box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    .alert-danger {
+        background-color: #f8d7da;
+        border: 1px solid #f5c6cb;
+        color: #721c24;
+        padding: 10px;
+        border-radius: 4px;
+        margin-bottom: 15px;
+    }
+    .btn-primary {
+        background-color: #007bff;
+        color: white;
+        border: none;
+        padding: 10px 15px;
+        cursor: pointer;
+        border-radius: 4px;
+    }
+    .btn-primary:hover {
+        background-color: #0069d9;
+    }
+</style>
 {% endblock %}

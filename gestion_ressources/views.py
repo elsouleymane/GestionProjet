@@ -1,11 +1,30 @@
-# gestion_ressources/views.py
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib import messages
 from django.utils import timezone
 from .models import Demande
-from .forms import DemandeForm # Nous créerons ce fichier ensuite
+from .forms import DemandeForm
+from django.contrib.auth import logout
+from django.contrib.auth.forms import UserCreationForm  # Ajoutez cet import
+from django.contrib.auth.models import User  # Ajoutez cet import pour la vue liste_employes
 
+
+def accueil(request):
+    """
+    Vue d'accueil qui redirige vers le tableau de bord approprié si l'utilisateur est connecté
+    ou affiche une page de bienvenue s'il n'est pas connecté
+    """
+    if request.user.is_authenticated:
+        if request.user.is_superuser:
+            # Rediriger vers le tableau de bord admin
+            return redirect('gestion_ressources:tableau_de_bord')
+        else:
+            # Rediriger vers le tableau de bord employé
+            return redirect('gestion_ressources:tableau_de_bord')
+    else:
+        # Afficher la page de bienvenue
+        return render(request, 'gestion_ressources/bienvenue.html')
+    
 # --- Fonctions utilitaires ---
 def is_superuser(user):
     return user.is_superuser
@@ -125,3 +144,39 @@ def imprimer_demande(request, pk):
     context = {'demande': demande}
     # Utilise un template spécifique pour l'impression, sans menus, etc.
     return render(request, 'gestion_ressources/demande_print.html', context)
+
+def logout_view(request):
+    """
+    Vue simplifiée de déconnexion qui fonctionne avec GET
+    """
+    from django.contrib.auth import logout as auth_logout
+    auth_logout(request)
+    from django.contrib import messages
+    messages.success(request, "Vous avez été déconnecté avec succès.")
+    return redirect('accueil')
+
+@login_required
+@user_passes_test(is_superuser)
+def creer_employe(request):
+    """
+    Vue permettant aux administrateurs de créer des comptes employés
+    """
+    if request.method == 'POST':
+        form = UserCreationForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            messages.success(request, f'Compte employé {user.username} créé avec succès.')
+            return redirect('gestion_ressources:liste_employes')
+    else:
+        form = UserCreationForm()
+    
+    return render(request, 'gestion_ressources/creer_employe.html', {'form': form})
+
+@login_required
+@user_passes_test(is_superuser)
+def liste_employes(request):
+    """
+    Vue pour afficher la liste des employés (admin uniquement)
+    """
+    employes = User.objects.filter(is_superuser=False)
+    return render(request, 'gestion_ressources/liste_employes.html', {'employes': employes})

@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-4xk1#6m!l21**%g=0id((esx%$fw)_3qz1!3f6x7*g0dck*8d!
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['https://*.github.dev', 'https://*.gitpod.io', 'localhost']
 
 
 # Application definition
@@ -57,10 +57,11 @@ ROOT_URLCONF = 'gestion_RH.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'gestion_RH/templates'],
+        'DIRS': [BASE_DIR / 'gestion_RH' / 'templates'],  # Modifier ce chemin
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
+                'django.template.context_processors.debug',  
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
@@ -115,14 +116,24 @@ USE_TZ = True
 
 
 # Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/5.2/howto/static-files/
-
-STATIC_URL = 'static/'
-# Ajoutez cette ligne pour indiquer où trouver les fichiers statiques en développement
-STATICFILES_DIRS = [BASE_DIR / "static"]
+STATIC_URL = '/static/'
+STATICFILES_DIRS = [
+    BASE_DIR / "gestion_RH" / "static",
+]
+STATIC_ROOT = BASE_DIR / "staticfiles"
 
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# Ajoutez ces paramètres en fin de fichier pour améliorer la sécurité CSRF
+CSRF_COOKIE_SECURE = False  # Mettre à True en production avec HTTPS
+CSRF_COOKIE_HTTPONLY = False  # Pour faciliter le développement
+SESSION_COOKIE_SECURE = False  # Mettre à True en production avec HTTPS
+CSRF_TRUSTED_ORIGINS = ['https://*.github.dev', 'https://*.gitpod.io', 'https://localhost:8000', 'http://localhost:8000']  # Pour les environnements de développement cloud
+
+# URL de redirection après login/logout
+LOGIN_REDIRECT_URL = '/gestion/'
+LOGOUT_REDIRECT_URL = '/'

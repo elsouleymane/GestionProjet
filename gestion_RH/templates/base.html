@@ -1,170 +1,34 @@
-<html>
+{% load static %}
 <!DOCTYPE html>
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Gestion Ressources{% endblock %}</title>
-    <!-- Intégrer CSS ici (Bootstrap, ou votre CSS perso) -->
-    <link rel="stylesheet" href="{% static 'css/style.css' %}"> {# Assurez-vous d'avoir configuré static files #}
-    <style>
-        body { font-family: sans-serif; margin: 20px; }
-        nav { margin-bottom: 20px; padding-bottom: 10px; border-bottom: 1px solid #ccc; }
-        nav a { margin-right: 15px; text-decoration: none; }
-        table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
-        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
-        th { background-color: #f2f2f2; }
-        .btn { padding: 5px 10px; border: none; cursor: pointer; text-decoration: none; display: inline-block; margin: 2px; border-radius: 3px;}
-        .btn-approve { background-color: #4CAF50; color: white; }
-        .btn-reject { background-color: #f44336; color: white; }
-        .btn-detail { background-color: #008CBA; color: white; }
-        .btn-print { background-color: #555; color: white; }
-        .messages { list-style: none; padding: 0; margin-bottom: 15px; }
-        .messages li { padding: 10px; margin-bottom: 5px; border-radius: 3px; }
-        .messages li.success { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
-        .messages li.error { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
-        .messages li.warning { background-color: #fff3cd; color: #856404; border: 1px solid #ffeeba; }
-        form p { margin-bottom: 10px; }
-        form label { display: block; margin-bottom: 5px; }
-        form input[type="text"], form input[type="date"], form select, form textarea { width: 100%; padding: 8px; box-sizing: border-box; margin-bottom: 10px; }
-
-        /* Styles pour l'impression */
-        @media print {
-            body * { visibility: hidden; } /* Cache tout par défaut */
-            .printable-area, .printable-area * { visibility: visible; } /* Montre la zone imprimable et son contenu */
-            .printable-area { position: absolute; left: 0; top: 0; width: 100%; }
-            nav, button, .no-print { display: none !important; } /* Cache la nav, les boutons etc */
-        }
-    </style>
+    <title>{% block title %}Gestion des Ressources{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
 </head>
 <body>
-    <nav>
-        <a href="{% url 'gestion_ressources:tableau_de_bord' %}">Tableau de Bord</a>
-        {% if user.is_authenticated %}
-            {% if not user.is_superuser %}
-                <a href="{% url 'gestion_ressources:creer_demande' %}">Nouvelle Demande</a>
-            {% endif %}
-             <span>Bonjour, {{ user.username }}</span>
-            <form action="{% url 'logout' %}" method="post" style="display: inline;">
-                {% csrf_token %}
-                <button type="submit" class="btn no-print" style="background-color: #aaa;">Déconnexion</button>
-            </form>
-        {% else %}
-            <a href="{% url 'login' %}">Connexion</a>
-        {% endif %}
-    </nav>
-
-    {% if messages %}
-    <ul class="messages">
-        {% for message in messages %}
-        <li class="{{ message.tags }}">{{ message }}</li>
-        {% endfor %}
-    </ul>
-    {% endif %}
-
+    <header>
+        <nav>
+            <ul>
+                <li><a href="{% url 'accueil' %}">Accueil</a></li>
+                {% if user.is_authenticated %}
+                    {% if user.is_superuser %}
+                        <li><a href="{% url 'gestion_ressources:liste_employes' %}">Gestion des Employés</a></li>
+                    {% endif %}
+                    <li><a href="{% url 'gestion_ressources:tableau_de_bord' %}">Tableau de Bord</a></li>
+                    <li><a href="{% url 'logout' %}">Déconnexion</a></li>
+                {% else %}
+                    <li><a href="{% url 'login' %}">Connexion</a></li>
+                {% endif %}
+            </ul>
+        </nav>
+    </header>
     <main>
-        {% block content %}
-        <!-- Le contenu spécifique à la page ira ici -->
-        {% endblock %}
+        {% block content %}{% endblock %}
     </main>
-
+    <footer>
+        <p>&copy; 2025 Gestion des Ressources</p>
+    </footer>
 </body>
-</html>
-```
-
-**Exemple : `templates/gestion_ressources/dashboard_admin.html`**
-
-```html
-{% extends 'base.html' %}
-
-{% block title %}Tableau de Bord Admin{% endblock %}
-
-{% block content %}
-<h2>Tableau de Bord Administrateur</h2>
-
-<section>
-    <h3>Demandes en Attente de Validation</h3>
-    {% if demandes_en_attente %}
-    <table>
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Demandeur</th>
-                <th>Type</th>
-                <th>Début</th>
-                <th>Fin</th>
-                <th>Soumis le</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for demande in demandes_en_attente %}
-            <tr>
-                <td>{{ demande.id }}</td>
-                <td>{{ demande.demandeur.username }}</td>
-                <td>{{ demande.get_type_demande_display }}</td>
-                <td>{{ demande.date_debut|date:"d/m/Y" }}</td>
-                <td>{{ demande.date_fin|date:"d/m/Y" }}</td>
-                <td>{{ demande.date_soumission|date:"d/m/Y H:i" }}</td>
-                <td>
-                    <a href="{% url 'gestion_ressources:detail_demande' demande.pk %}" class="btn btn-detail">Voir</a>
-                    <form action="{% url 'gestion_ressources:approuver_demande' demande.pk %}" method="post" style="display: inline;">
-                        {% csrf_token %}
-                        <!-- Ajouter input pour commentaire si besoin -->
-                        <button type="submit" class="btn btn-approve">Approuver</button>
-                    </form>
-                     <form action="{% url 'gestion_ressources:rejeter_demande' demande.pk %}" method="post" style="display: inline;">
-                        {% csrf_token %}
-                        <!-- IMPORTANT: Ajouter un champ commentaire ici -->
-                        <input type="text" name="commentaire" placeholder="Motif du rejet (obligatoire)" required style="width:auto; padding: 4px;">
-                        <button type="submit" class="btn btn-reject">Rejeter</button>
-                    </form>
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-    {% else %}
-    <p>Aucune demande en attente.</p>
-    {% endif %}
-</section>
-
-<section>
-    <h3>Dernières Demandes Traitées</h3>
-     {% if demandes_traitees %}
-    <table>
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Demandeur</th>
-                <th>Type</th>
-                <th>Statut</th>
-                <th>Traité le</th>
-                <th>Traité par</th>
-                 <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for demande in demandes_traitees %}
-            <tr>
-                <td>{{ demande.id }}</td>
-                <td>{{ demande.demandeur.username }}</td>
-                <td>{{ demande.get_type_demande_display }}</td>
-                <td>{{ demande.get_statut_display }}</td>
-                <td>{{ demande.date_traitement|date:"d/m/Y H:i" }}</td>
-                 <td>{{ demande.traitee_par.username|default:"N/A" }}</td>
-                <td>
-                     <a href="{% url 'gestion_ressources:detail_demande' demande.pk %}" class="btn btn-detail">Voir</a>
-                     <a href="{% url 'gestion_ressources:imprimer_demande' demande.pk %}" class="btn btn-print no-print" target="_blank">Imprimer</a>
-                 </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-    {% else %}
-    <p>Aucune demande traitée récemment.</p>
-    {% endif %}
-</section>
-
-{% endblock %}
 </html>

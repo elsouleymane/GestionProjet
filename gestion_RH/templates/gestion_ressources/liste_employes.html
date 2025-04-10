@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+
+{% block title %}Liste des employés{% endblock %}
+
+{% block content %}
+<h1>Liste des employés</h1>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Nom d'utilisateur</th>
+            <th>Adresse email</th>
+            <th>Date d'inscription</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for employe in employes %}
+        <tr>
+            <td>{{ employe.username }}</td>
+            <td>{{ employe.email }}</td>
+            <td>{{ employe.date_joined }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+<a href="{% url 'gestion_ressources:creer_employe' %}" class="btn btn-primary">Créer un nouvel employé</a>
+{% endblock %}
