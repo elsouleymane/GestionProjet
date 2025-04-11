@@ -25,12 +25,7 @@ def run_migrations():
     call_command('migrate', interactive=False)
     print("Migrations terminées avec succès.")
 
-def collect_static():
-    """Collecte les fichiers statiques"""
-    print("Collecte des fichiers statiques...")
-    from django.core.management import call_command
-    call_command('collectstatic', interactive=False)
-    print("Collecte des fichiers statiques terminée avec succès.")
+
 
 def create_superuser():
     """Crée un superutilisateur s'il n'existe pas déjà"""
@@ -65,7 +60,6 @@ if __name__ == "__main__":
     if database_is_ready():
         print("Base de données connectée avec succès.")
         run_migrations()
-        collect_static()
         create_superuser()
         print("Initialisation terminée. L'application est prête à être utilisée.")
     else:
